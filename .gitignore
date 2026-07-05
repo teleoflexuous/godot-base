@@ -1,0 +1,31 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Export/build output
+builds/
+release/
+exports/
+output/
+
+# Test output artifacts
+test_stdout.txt
+test_stderr.txt
+tests/logs/
+
+# opencode local tooling cache
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
+.opencode/bun.lock
+
+# Python/dev-script cache
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Godot/editor temp files
+project.godot~*
+export_presets.cfg~*
+*.TMP
+*.tmp

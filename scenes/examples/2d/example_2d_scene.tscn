@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(480, 32)
+
+[node name="Example2DScene" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -96)
+enabled = true
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 80)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="GroundVisual" type="Polygon2D" parent="Ground"]
+color = Color(0.211765, 0.737255, 0.447059, 1)
+polygon = PackedVector2Array(-240, -16, 240, -16, 240, 16, -240, 16)
+
+[node name="HeroMarker" type="Polygon2D" parent="."]
+position = Vector2(0, 32)
+color = Color(0.376471, 0.647059, 0.980392, 1)
+polygon = PackedVector2Array(0, -32, 28, 24, -28, 24)

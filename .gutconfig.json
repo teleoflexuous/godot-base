@@ -1,0 +1,12 @@
+{
+	"dirs": [
+		"res://tests/unit/",
+		"res://tests/integration/",
+		"res://tests/performance/"
+	],
+	"include_subdirs": true,
+	"prefix": "test_",
+	"suffix": ".gd",
+	"should_exit": true,
+	"log_level": 1
+}
