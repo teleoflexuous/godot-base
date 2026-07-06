@@ -111,8 +111,7 @@ func test_web_export_preset_is_committed_for_ci_exports() -> void:
 	assert_true(preset_text.contains('platform="Web"'))
 	assert_true(preset_text.contains('export_path="builds/web/index.html"'))
 	assert_true(preset_text.contains('variant/thread_support=false'))
-	assert_true(preset_text.contains('variant/extensions_support=false'))
-	assert_true(preset_text.contains('include_coi_service_worker=false'))
+	assert_true(preset_text.contains('variant/extensions_support=true'))
 	assert_true(preset_text.contains('exclude_filter=".github/*,.opencode/*,addons/GoLogger/*,addons/gut/*'))
 	assert_true(preset_text.contains('scripts/common/*'))
 	assert_true(preset_text.contains('tests/*'))
@@ -167,9 +166,9 @@ func test_release_automation_doc_lists_required_setup() -> void:
 	assert_true(doc_text.contains("automatically replaces the embedded build"))
 	assert_true(doc_text.contains("No repeat manual step"))
 	assert_true(doc_text.contains("shadow"))
-	assert_true(doc_text.contains("Extension support is also disabled"))
-	assert_true(doc_text.contains("SharedArrayBuffer"))
-	assert_true(doc_text.contains("per-game decision"))
+	assert_true(doc_text.contains("GDExtension support"))
+	assert_true(doc_text.contains("SharedArrayBuffer support"))
+	assert_true(doc_text.contains("cross-origin isolation"))
 
 
 func test_env_example_documents_required_keys() -> void:

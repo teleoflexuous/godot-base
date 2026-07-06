@@ -45,11 +45,11 @@
 
 - Godot 4 web exports use the Compatibility renderer, while this base defaults to Forward Plus for desktop.
 - Keep the base default as-is for native projects, but verify browser behavior before treating web export as a guaranteed shipping target.
-- The committed web preset disables thread support so the default itch deployment path does not depend on cross-origin isolation headers.
-- Extension support is also disabled. Per the Godot 4.7 web export guide, both thread support and GDExtension extension support independently require cross-origin isolation (`Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers, backed by `SharedArrayBuffer`). With both off, the export runs single-threaded without `SharedArrayBuffer`, which is Godot's recommended and default web configuration and the most compatible with itch.io, Safari, and iOS.
-- With extensions disabled, the GameAnalytics GDExtension does not load on web and the `Analytics` autoload stays `enabled = false` (see `autoloads/analytics.gd`). It no-ops safely, so the web build still runs. The export log may emit a "GDExtension libraries are not supported" notice; this is expected and harmless for the base template. GameAnalytics still works on native desktop and mobile exports.
-- If a concrete game needs live analytics on web, switch the web preset to thread support and extension support, then enable the COI service worker (`include_coi_service_worker=true`) or rely on the itch.io "SharedArrayBuffer support" embed option, and accept the reduced Safari/iOS compatibility. That is a per-game decision, not the base default. Enabling extensions forces the dlink-enabled (threaded) template, so extensions and threads go together on web.
-- Butler only uploads files; it cannot set itch.io embed options such as viewport dimensions, mobile-friendly, orientation, auto-start, fullscreen button, or the SharedArrayBuffer toggle. Those are configured once on the itch.io Edit game page (see "First itch Upload"). The SharedArrayBuffer option is not required for the single-threaded base build.
+- The committed web preset enables GDExtension support (`variant/extensions_support=true`) so GameAnalytics runs on web, and keeps thread support disabled (`variant/thread_support=false`). Godot 4.7 ships a matching `web_dlink_nothreads_release.zip` template, so no custom template build is required; the editor selects it automatically from those two flags.
+- Thread support stays off on purpose. GameAnalytics does not need threads, and the single-threaded dlink template avoids thread-pool tuning and the extra compatibility headaches of pthreads on the web.
+- Because extensions are enabled, the web build requires cross-origin isolation (`Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers, backed by `SharedArrayBuffer`). On itch.io this is provided by ticking **SharedArrayBuffer support** under Embed options (see "First itch Upload"); it is a one-time setting that persists across butler pushes. With extensions on, the GameAnalytics GDExtension loads and the `Analytics` autoload enables when keys are present (see `autoloads/analytics.gd`), and the earlier "GDExtension libraries are not supported" notice no longer appears.
+- The obsolete `include_coi_service_worker` option was removed (Godot 4.7 replaced it with the Progressive Web App `ensure_cross_origin_isolation_headers` option). COI is delivered host-side via the itch.io checkbox instead. For non-itch hosts that you control, set COOP/COEP headers directly, or enable `progressive_web_app/enabled` with `progressive_web_app/ensure_cross_origin_isolation_headers` for a self-contained service-worker fallback.
+- Butler only uploads files; it cannot set itch.io embed options such as viewport dimensions, mobile-friendly, orientation, auto-start, or fullscreen button. Those are configured once on the itch.io Edit game page (see "First itch Upload"). Local testing of this web build needs a COI-capable server (e.g. Godot's `serve.py` from the web export docs), because SharedArrayBuffer requires COOP/COEP headers even on `localhost`.
 
 ## First itch Upload
 
@@ -61,7 +61,8 @@
   2. Set **Kind of project** to `HTML`.
   3. Under **Uploads**, tick **This file will be played in the web browser** on the `html` channel upload.
   4. Under **Embed options**, set viewport dimensions to match `project.godot` (`1280x720`).
-  5. Delete any leftover manual `.zip` upload; a non-butler upload is known to shadow the embedded butler build.
-  6. Save.
+  5. Under **Embed options**, tick **SharedArrayBuffer support**. Required: the web preset enables GDExtension (GameAnalytics), which needs cross-origin isolation headers that itch.io only sends when this is checked.
+  6. Delete any leftover manual `.zip` upload; a non-butler upload is known to shadow the embedded butler build.
+  7. Save.
 - Once the `html` channel is marked playable in browser, every subsequent butler push to `html` automatically replaces the embedded build. No repeat manual step is needed for updates.
 - Verify after pushing: open the project page in an incognito window; the build should run inline rather than offer a download.
