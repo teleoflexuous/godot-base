@@ -27,5 +27,6 @@ __pycache__/
 # Godot/editor temp files
 project.godot~*
 export_presets.cfg~*
+override.cfg
 *.TMP
 *.tmp

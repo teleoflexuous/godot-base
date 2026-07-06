@@ -17,13 +17,15 @@ env:
 
 jobs:
   validate_itch_setup:
-    name: Validate itch deployment configuration
+    name: Validate deployment and analytics configuration
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fail until itch deployment is fully configured
+      - name: Fail until deployment and analytics are fully configured
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          GAMEANALYTICS_GAME_KEY: ${{ secrets.GAMEANALYTICS_GAME_KEY }}
+          GAMEANALYTICS_SECRET_KEY: ${{ secrets.GAMEANALYTICS_SECRET_KEY }}
           ITCH_DEPLOY_ENABLED: ${{ vars.ITCH_DEPLOY_ENABLED }}
           ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
         run: |
@@ -47,6 +49,16 @@ jobs:
             failures=1
           fi
 
+          if [ -z "$GAMEANALYTICS_GAME_KEY" ]; then
+            echo "Missing repository secret GAMEANALYTICS_GAME_KEY." >&2
+            failures=1
+          fi
+
+          if [ -z "$GAMEANALYTICS_SECRET_KEY" ]; then
+            echo "Missing repository secret GAMEANALYTICS_SECRET_KEY." >&2
+            failures=1
+          fi
+
           if [ "$failures" -ne 0 ]; then
             exit 1
           fi
@@ -60,6 +72,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Write analytics override configuration
+        env:
+          GAMEANALYTICS_GAME_KEY: ${{ secrets.GAMEANALYTICS_GAME_KEY }}
+          GAMEANALYTICS_SECRET_KEY: ${{ secrets.GAMEANALYTICS_SECRET_KEY }}
+        run: |
+          cat <<EOF > override.cfg
+          [analytics]
+          game_key="$GAMEANALYTICS_GAME_KEY"
+          secret_key="$GAMEANALYTICS_SECRET_KEY"
+          EOF
+
       - name: Set up Godot
         uses: lihop/setup-godot@v3
         with:
@@ -68,6 +91,12 @@ jobs:
           cache: true
 
       - name: Run project test suite
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          GAMEANALYTICS_GAME_KEY: ${{ secrets.GAMEANALYTICS_GAME_KEY }}
+          GAMEANALYTICS_SECRET_KEY: ${{ secrets.GAMEANALYTICS_SECRET_KEY }}
+          ITCH_DEPLOY_ENABLED: ${{ vars.ITCH_DEPLOY_ENABLED }}
+          ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
         run: godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit
 
       - name: Export web build
@@ -78,6 +107,28 @@ jobs:
 
           if grep -Eq '(^SCRIPT ERROR:|Parse Error:|^ERROR: Failed to load script|^ERROR: Error loading extension|^ERROR: Can.t open GDExtension dynamic library)' "$WEB_BUILD_DIR/export.log"; then
             echo "Godot export reported script or extension errors." >&2
+            exit 1
+          fi
+
+      - name: Validate exported web files
+        run: |
+          failures=0
+
+          for file in index.html index.js index.pck index.wasm; do
+            if [ ! -f "$WEB_BUILD_DIR/$file" ]; then
+              echo "Missing exported web file: $WEB_BUILD_DIR/$file" >&2
+              failures=1
+            fi
+          done
+
+          for file in GameAnalytics.js libGodotGameAnalytics.wasm; do
+            if [ ! -f "$WEB_BUILD_DIR/$file" ]; then
+              echo "Missing GameAnalytics web artifact: $WEB_BUILD_DIR/$file" >&2
+              failures=1
+            fi
+          done
+
+          if [ "$failures" -ne 0 ]; then
             exit 1
           fi
 
