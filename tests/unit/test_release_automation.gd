@@ -28,8 +28,8 @@ func _read_text(path: String) -> String:
 	return file.get_as_text()
 
 
-func _required_env(name: String, guidance: String) -> String:
-	var value := EnvFile.get_value(name, _env_cache).strip_edges()
+func _required_env(env_name: String, guidance: String) -> String:
+	var value := EnvFile.get_value(env_name, _env_cache).strip_edges()
 	assert_ne(value, "", guidance)
 	return value
 
@@ -111,6 +111,8 @@ func test_web_export_preset_is_committed_for_ci_exports() -> void:
 	assert_true(preset_text.contains('platform="Web"'))
 	assert_true(preset_text.contains('export_path="builds/web/index.html"'))
 	assert_true(preset_text.contains('variant/thread_support=false'))
+	assert_true(preset_text.contains('variant/extensions_support=false'))
+	assert_true(preset_text.contains('include_coi_service_worker=false'))
 	assert_true(preset_text.contains('exclude_filter=".github/*,.opencode/*,addons/GoLogger/*,addons/gut/*'))
 	assert_true(preset_text.contains('scripts/common/*'))
 	assert_true(preset_text.contains('tests/*'))
@@ -165,6 +167,9 @@ func test_release_automation_doc_lists_required_setup() -> void:
 	assert_true(doc_text.contains("automatically replaces the embedded build"))
 	assert_true(doc_text.contains("No repeat manual step"))
 	assert_true(doc_text.contains("shadow"))
+	assert_true(doc_text.contains("Extension support is also disabled"))
+	assert_true(doc_text.contains("SharedArrayBuffer"))
+	assert_true(doc_text.contains("per-game decision"))
 
 
 func test_env_example_documents_required_keys() -> void:

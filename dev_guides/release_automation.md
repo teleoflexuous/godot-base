@@ -46,6 +46,10 @@
 - Godot 4 web exports use the Compatibility renderer, while this base defaults to Forward Plus for desktop.
 - Keep the base default as-is for native projects, but verify browser behavior before treating web export as a guaranteed shipping target.
 - The committed web preset disables thread support so the default itch deployment path does not depend on cross-origin isolation headers.
+- Extension support is also disabled. Per the Godot 4.7 web export guide, both thread support and GDExtension extension support independently require cross-origin isolation (`Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers, backed by `SharedArrayBuffer`). With both off, the export runs single-threaded without `SharedArrayBuffer`, which is Godot's recommended and default web configuration and the most compatible with itch.io, Safari, and iOS.
+- With extensions disabled, the GameAnalytics GDExtension does not load on web and the `Analytics` autoload stays `enabled = false` (see `autoloads/analytics.gd`). It no-ops safely, so the web build still runs. The export log may emit a "GDExtension libraries are not supported" notice; this is expected and harmless for the base template. GameAnalytics still works on native desktop and mobile exports.
+- If a concrete game needs live analytics on web, switch the web preset to thread support and extension support, then enable the COI service worker (`include_coi_service_worker=true`) or rely on the itch.io "SharedArrayBuffer support" embed option, and accept the reduced Safari/iOS compatibility. That is a per-game decision, not the base default. Enabling extensions forces the dlink-enabled (threaded) template, so extensions and threads go together on web.
+- Butler only uploads files; it cannot set itch.io embed options such as viewport dimensions, mobile-friendly, orientation, auto-start, fullscreen button, or the SharedArrayBuffer toggle. Those are configured once on the itch.io Edit game page (see "First itch Upload"). The SharedArrayBuffer option is not required for the single-threaded base build.
 
 ## First itch Upload
 
