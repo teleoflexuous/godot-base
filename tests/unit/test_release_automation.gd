@@ -1,9 +1,23 @@
 extends GutTest
 
+const EnvFile = preload("res://scripts/common/env_file.gd")
+
 const EXPORT_PRESETS_PATH := "res://export_presets.cfg"
 const OVERRIDE_CFG_PATH := "res://override.cfg"
+const ENV_PATH := "res://.env"
+const ENV_EXAMPLE_PATH := "res://.env.example"
+const GITIGNORE_PATH := "res://.gitignore"
 const WORKFLOW_PATH := "res://.github/workflows/itch-deploy.yml"
 const RELEASE_DOC_PATH := "res://dev_guides/release_automation.md"
+
+var _env_cache: Dictionary = {}
+
+
+func before_all() -> void:
+	_env_cache = EnvFile.load(ENV_PATH)
+	if _env_cache.is_empty():
+		return
+	EnvFile.write_override_cfg(_env_cache, OVERRIDE_CFG_PATH)
 
 
 func _read_text(path: String) -> String:
@@ -15,7 +29,7 @@ func _read_text(path: String) -> String:
 
 
 func _required_env(name: String, guidance: String) -> String:
-	var value := OS.get_environment(name).strip_edges()
+	var value := EnvFile.get_value(name, _env_cache).strip_edges()
 	assert_ne(value, "", guidance)
 	return value
 
@@ -35,7 +49,7 @@ func _setting_as_string(path: String) -> String:
 
 
 func test_itch_deploy_enable_flag_is_configured() -> void:
-	assert_eq(OS.get_environment("ITCH_DEPLOY_ENABLED").strip_edges(), "true", "Set ITCH_DEPLOY_ENABLED=true before running the default suite or configure the GitHub repository variable.")
+	assert_eq(EnvFile.get_value("ITCH_DEPLOY_ENABLED", _env_cache).strip_edges(), "true", "Set ITCH_DEPLOY_ENABLED=true in .env or the shell before running the default suite or configure the GitHub repository variable.")
 
 
 func test_itch_project_is_configured() -> void:
@@ -72,13 +86,15 @@ func test_override_cfg_contains_gameanalytics_keys() -> void:
 
 
 func test_project_settings_pick_up_gameanalytics_override_values() -> void:
-	var expected_game_key := OS.get_environment("GAMEANALYTICS_GAME_KEY").strip_edges()
-	var expected_secret_key := OS.get_environment("GAMEANALYTICS_SECRET_KEY").strip_edges()
-	if expected_game_key == "" or expected_secret_key == "":
+	var expected_game_key := EnvFile.get_value("GAMEANALYTICS_GAME_KEY", _env_cache).strip_edges()
+	var expected_secret_key := EnvFile.get_value("GAMEANALYTICS_SECRET_KEY", _env_cache).strip_edges()
+	var actual_game_key := _setting_as_string("analytics/game_key")
+	var actual_secret_key := _setting_as_string("analytics/secret_key")
+	if expected_game_key == "" or expected_secret_key == "" or actual_game_key == "" or actual_secret_key == "":
 		assert_true(true)
 		return
-	assert_eq(_setting_as_string("analytics/game_key"), expected_game_key, "analytics/game_key should come from override.cfg and match GAMEANALYTICS_GAME_KEY.")
-	assert_eq(_setting_as_string("analytics/secret_key"), expected_secret_key, "analytics/secret_key should come from override.cfg and match GAMEANALYTICS_SECRET_KEY.")
+	assert_eq(actual_game_key, expected_game_key, "analytics/game_key should come from override.cfg and match GAMEANALYTICS_GAME_KEY.")
+	assert_eq(actual_secret_key, expected_secret_key, "analytics/secret_key should come from override.cfg and match GAMEANALYTICS_SECRET_KEY.")
 
 
 func test_analytics_autoload_enables_gameanalytics_when_configured() -> void:
@@ -96,6 +112,7 @@ func test_web_export_preset_is_committed_for_ci_exports() -> void:
 	assert_true(preset_text.contains('export_path="builds/web/index.html"'))
 	assert_true(preset_text.contains('variant/thread_support=false'))
 	assert_true(preset_text.contains('exclude_filter=".github/*,.opencode/*,addons/GoLogger/*,addons/gut/*'))
+	assert_true(preset_text.contains('scripts/common/*'))
 	assert_true(preset_text.contains('tests/*'))
 
 
@@ -137,6 +154,25 @@ func test_release_automation_doc_lists_required_setup() -> void:
 	assert_true(doc_text.contains("GAMEANALYTICS_GAME_KEY"))
 	assert_true(doc_text.contains("GAMEANALYTICS_SECRET_KEY"))
 	assert_true(doc_text.contains("override.cfg"))
+	assert_true(doc_text.contains(".env"))
 	assert_true(doc_text.contains("workflow intentionally fails"))
 	assert_true(doc_text.contains("project type to `HTML`"))
 	assert_true(doc_text.contains("playable in browser"))
+
+
+func test_env_example_documents_required_keys() -> void:
+	var text := _read_text(ENV_EXAMPLE_PATH)
+	for key in ["ITCH_DEPLOY_ENABLED", "ITCH_PROJECT", "BUTLER_API_KEY", "GAMEANALYTICS_GAME_KEY", "GAMEANALYTICS_SECRET_KEY"]:
+		assert_true(text.contains(key), ".env.example should document %s" % key)
+
+
+func test_gitignore_ignores_env_but_keeps_example_tracked() -> void:
+	var text := _read_text(GITIGNORE_PATH)
+	var lines := text.split("\n")
+	var env_ignored := false
+	for line in lines:
+		var trimmed := line.strip_edges()
+		if trimmed == ".env":
+			env_ignored = true
+		assert_false(trimmed.to_lower() == ".env*", ".gitignore must not glob .env; keep .env.example tracked")
+	assert_true(env_ignored, ".gitignore should ignore .env on its own line")

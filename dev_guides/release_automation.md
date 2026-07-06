@@ -4,7 +4,7 @@
 
 - `.github/workflows/itch-deploy.yml` runs on pull requests, pushes to `main`, and manual dispatch.
 - The workflow intentionally fails until itch deployment is fully configured in GitHub.
-- The default local GUT suite also fails until the same deploy and analytics settings are present in the shell environment and `override.cfg`.
+- The default local GUT suite also fails until the same deploy and analytics settings are provided through `.env` (or exported in the shell) and `override.cfg` is regenerated from it.
 - The workflow runs the default GUT suite before exporting `Web` from the committed `export_presets.cfg` preset.
 - Every successful run uploads `builds/web/` as a GitHub artifact.
 - Actual deployment to itch still only runs on pushes to `main` after configuration validation and export pass.
@@ -20,16 +20,12 @@
 
 ## Local Test Setup
 
-- Export `ITCH_DEPLOY_ENABLED=true` in the shell before running the default suite.
-- Export `ITCH_PROJECT`, `BUTLER_API_KEY`, `GAMEANALYTICS_GAME_KEY`, and `GAMEANALYTICS_SECRET_KEY` in the shell before running the default suite.
-- Create a local `override.cfg` in the project root with:
-
-```ini
-[analytics]
-game_key="your-gameanalytics-game-key"
-secret_key="your-gameanalytics-secret-key"
-```
-
+- Copy `.env.example` to `.env` at the project root and fill in real values for all five keys.
+- `.env` is intentionally ignored by git; never commit secrets.
+- Running the default GUT suite loads `.env` and refreshes `override.cfg` from `GAMEANALYTICS_GAME_KEY` and `GAMEANALYTICS_SECRET_KEY`, so analytics keys live in one place.
+- To refresh `override.cfg` without running tests (for example before opening the editor), run `godot --headless --path . -s res://tools/setup_local.gd`.
+- Values in `.env` take precedence over shell environment variables locally; CI does not ship a `.env`, so GitHub secrets and variables still drive the workflow unchanged.
+- As an alternative for CI-like shells, you can `export` the same five variables instead of using `.env`.
 - `override.cfg` is intentionally ignored by git.
 
 ## Versioning
