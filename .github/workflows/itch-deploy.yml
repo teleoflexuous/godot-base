@@ -1,0 +1,136 @@
+name: Test, Export, and Deploy to itch
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.7-stable
+  WEB_EXPORT_PRESET: Web
+  WEB_BUILD_DIR: builds/web
+
+jobs:
+  validate_itch_setup:
+    name: Validate itch deployment configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail until itch deployment is fully configured
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_DEPLOY_ENABLED: ${{ vars.ITCH_DEPLOY_ENABLED }}
+          ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
+        run: |
+          failures=0
+
+          if [ "$ITCH_DEPLOY_ENABLED" != "true" ]; then
+            echo "ITCH_DEPLOY_ENABLED must be set to true for this workflow to pass." >&2
+            failures=1
+          fi
+
+          if [ -z "$ITCH_PROJECT" ]; then
+            echo "Missing repository variable ITCH_PROJECT. Expected format: user/game" >&2
+            failures=1
+          elif ! printf '%s' "$ITCH_PROJECT" | grep -Eq '^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$'; then
+            echo "Invalid ITCH_PROJECT value '$ITCH_PROJECT'. Expected lowercase user/game." >&2
+            failures=1
+          fi
+
+          if [ -z "$BUTLER_API_KEY" ]; then
+            echo "Missing repository secret BUTLER_API_KEY." >&2
+            failures=1
+          fi
+
+          if [ "$failures" -ne 0 ]; then
+            exit 1
+          fi
+
+  test_and_export_web:
+    name: Test and export web build
+    runs-on: ubuntu-latest
+    needs: validate_itch_setup
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Godot
+        uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          export-templates: true
+          cache: true
+
+      - name: Run project test suite
+        run: godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit
+
+      - name: Export web build
+        run: |
+          mkdir -p "$WEB_BUILD_DIR"
+          set -o pipefail
+          godot --headless --path . --export-release "$WEB_EXPORT_PRESET" "$WEB_BUILD_DIR/index.html" 2>&1 | tee "$WEB_BUILD_DIR/export.log"
+
+          if grep -Eq '(^SCRIPT ERROR:|Parse Error:|^ERROR: Failed to load script|^ERROR: Error loading extension|^ERROR: Can.t open GDExtension dynamic library)' "$WEB_BUILD_DIR/export.log"; then
+            echo "Godot export reported script or extension errors." >&2
+            exit 1
+          fi
+
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: ${{ env.WEB_BUILD_DIR }}
+          if-no-files-found: error
+
+  deploy_itch:
+    name: Deploy web build to itch
+    runs-on: ubuntu-latest
+    needs: test_and_export_web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: itch-deploy-main
+      cancel-in-progress: true
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download web build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: ${{ env.WEB_BUILD_DIR }}
+
+      - name: Install butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler-bin
+          chmod +x butler-bin/butler
+
+      - name: Build itch version string
+        id: build_version
+        run: |
+          VERSION="$(sed -n 's/^config\/version="\([^"]*\)"/\1/p' project.godot)"
+
+          if [ -z "$VERSION" ]; then
+            echo "Could not read config/version from project.godot" >&2
+            exit 1
+          fi
+
+          SHORT_SHA="${GITHUB_SHA::7}"
+          echo "value=${VERSION}+${GITHUB_RUN_NUMBER}.${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Push web build to itch
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
+        run: |
+          butler-bin/butler push "$WEB_BUILD_DIR" "$ITCH_PROJECT:web" \
+            --if-changed \
+            --userversion "${{ steps.build_version.outputs.value }}"

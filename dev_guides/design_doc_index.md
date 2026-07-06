@@ -7,6 +7,7 @@ Use this file to map project-specific design docs to implementation owners.
 | Base scaffold | `dev_guides/architecture.md` | Root scene, autoloads, examples | Current |
 | UI approach | `dev_guides/ui_architecture.md` | Root UI, future HUD/menu scenes | Current |
 | ProperUI options | `dev_guides/properui_inventory.md` | Optional owned UI addons | Current |
+| Release automation | `dev_guides/release_automation.md` | GitHub Actions, Godot export preset, itch deployment | Current |
 
 ## Rules
 

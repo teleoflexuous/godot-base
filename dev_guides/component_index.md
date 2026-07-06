@@ -12,6 +12,7 @@ Keep this table in parity with scene/script/test changes. Update it when adding,
 | Audio settings | n/a | `autoloads/audio_settings.gd` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Stubbed |
 | Graphics settings | n/a | `autoloads/graphics_settings.gd`, `scripts/common/graphics_quality_tiers.gd` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Stubbed |
 | Analytics facade | n/a | `autoloads/analytics.gd`, `addons/GameAnalytics/` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Stubbed |
+| Release automation | n/a | `.github/workflows/itch-deploy.yml`, `export_presets.cfg` | `release_automation.md` | `tests/unit/test_release_automation.gd` | Verified |
 | Test framework | n/a | `addons/gut/` | `testing_strategy.md` | self-hosted GUT commands | Verified by run |
 
 Completion values are `Stubbed`, `Implemented`, `Verified`, `Example`, or `Deferred`.
