@@ -141,9 +141,11 @@ func test_itch_workflow_runs_tests_exports_web_and_deploys_from_main() -> void:
 	assert_true(workflow_text.contains("Invalid ITCH_PROJECT value '$ITCH_PROJECT'. Expected lowercase user/game."))
 	assert_true(workflow_text.contains("Missing repository secret BUTLER_API_KEY."))
 	assert_true(workflow_text.contains("if: github.event_name == 'push' && github.ref == 'refs/heads/main'"))
-	assert_true(workflow_text.contains('butler-bin/butler push "$WEB_BUILD_DIR" "$ITCH_PROJECT:web"'))
+	assert_true(workflow_text.contains('butler-bin/butler push "$WEB_BUILD_DIR" "$ITCH_PROJECT:html"'))
 	assert_true(workflow_text.contains("--if-changed"))
 	assert_true(workflow_text.contains("--userversion"))
+	assert_true(workflow_text.contains("::notice::"))
+	assert_true(workflow_text.contains("This file will be played in the web browser"))
 
 
 func test_release_automation_doc_lists_required_setup() -> void:
@@ -156,8 +158,13 @@ func test_release_automation_doc_lists_required_setup() -> void:
 	assert_true(doc_text.contains("override.cfg"))
 	assert_true(doc_text.contains(".env"))
 	assert_true(doc_text.contains("workflow intentionally fails"))
-	assert_true(doc_text.contains("project type to `HTML`"))
+	assert_true(doc_text.contains("`html` channel"))
+	assert_true(doc_text.contains("Kind of project"))
+	assert_true(doc_text.contains("This file will be played in the web browser"))
 	assert_true(doc_text.contains("playable in browser"))
+	assert_true(doc_text.contains("automatically replaces the embedded build"))
+	assert_true(doc_text.contains("No repeat manual step"))
+	assert_true(doc_text.contains("shadow"))
 
 
 func test_env_example_documents_required_keys() -> void:

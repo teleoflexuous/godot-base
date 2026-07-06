@@ -182,6 +182,7 @@ jobs:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
         run: |
-          butler-bin/butler push "$WEB_BUILD_DIR" "$ITCH_PROJECT:web" \
+          butler-bin/butler push "$WEB_BUILD_DIR" "$ITCH_PROJECT:html" \
             --if-changed \
             --userversion "${{ steps.build_version.outputs.value }}"
+          echo "::notice::HTML build pushed to the 'html' channel. The first time only, open the itch.io Edit game page and set Kind of project = HTML, then tick 'This file will be played in the web browser' on the html upload. Future butler pushes to html auto-update the embed automatically. See dev_guides/release_automation.md."

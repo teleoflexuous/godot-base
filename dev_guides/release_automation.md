@@ -50,4 +50,14 @@
 ## First itch Upload
 
 - Create the itch project page before enabling deploys.
-- After the first upload, set the itch project type to `HTML` and mark the uploaded file as playable in browser.
+- The deploy workflow pushes the web build to the `html` channel via `butler push "$ITCH_PROJECT:html"`.
+- Butler cannot tag an HTML channel as playable in browser automatically. This is a documented itch.io limitation, unlike win/mac/linux channels where butler sets platform tags for you. The kind and embed flag must be set once on the project page after the first push.
+- After the first successful push to the `html` channel, do this one-time setup on itch.io:
+  1. Creator Dashboard -> Edit game.
+  2. Set **Kind of project** to `HTML`.
+  3. Under **Uploads**, tick **This file will be played in the web browser** on the `html` channel upload.
+  4. Under **Embed options**, set viewport dimensions to match `project.godot` (`1280x720`).
+  5. Delete any leftover manual `.zip` upload; a non-butler upload is known to shadow the embedded butler build.
+  6. Save.
+- Once the `html` channel is marked playable in browser, every subsequent butler push to `html` automatically replaces the embedded build. No repeat manual step is needed for updates.
+- Verify after pushing: open the project page in an incognito window; the build should run inline rather than offer a download.
