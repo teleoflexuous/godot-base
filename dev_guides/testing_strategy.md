@@ -22,6 +22,12 @@ Default project suite:
 godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit
 ```
 
+Web export browser smoke test after exporting `builds/web/`:
+
+```text
+node tools/web_smoke_check.cjs builds/web
+```
+
 Unit tests only:
 
 ```text
@@ -44,4 +50,5 @@ godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/per
 
 - Every reusable autoload should have a unit contract test.
 - Every sample scene should have a load/smoke integration test.
+- Web release candidates should pass a real browser smoke test against the exported HTML build, not just a headless Godot export.
 - Every project-specific runtime system should name its owning scene/script/test/docs in `component_index.md`.

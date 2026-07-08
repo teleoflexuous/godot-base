@@ -12,6 +12,7 @@ permissions:
 
 env:
   GODOT_VERSION: 4.7-stable
+  PLAYWRIGHT_VERSION: 1.46.1
   WEB_EXPORT_PRESET: Web
   WEB_BUILD_DIR: builds/web
 
@@ -90,6 +91,11 @@ jobs:
           export-templates: true
           cache: true
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Run project test suite
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
@@ -131,6 +137,20 @@ jobs:
           if [ "$failures" -ne 0 ]; then
             exit 1
           fi
+
+      - name: Install web smoke test tooling
+        run: |
+          mkdir -p "$RUNNER_TEMP/web-smoke-tools"
+          cp tools/web_smoke_check.cjs "$RUNNER_TEMP/web-smoke-tools/"
+          cd "$RUNNER_TEMP/web-smoke-tools"
+          npm init -y >/dev/null 2>&1
+          npm install "playwright@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+
+      - name: Smoke test exported web build in desktop and mobile Chromium
+        run: |
+          cd "$RUNNER_TEMP/web-smoke-tools"
+          node web_smoke_check.cjs "$GITHUB_WORKSPACE/$WEB_BUILD_DIR"
 
       - name: Upload web build artifact
         uses: actions/upload-artifact@v4
