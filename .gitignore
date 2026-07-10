@@ -12,6 +12,8 @@ output/
 test_stdout.txt
 test_stderr.txt
 tests/logs/
+artifacts/*
+!artifacts/.gdignore
 
 # opencode local tooling cache
 .opencode/node_modules/
@@ -31,3 +33,4 @@ override.cfg
 .env
 *.TMP
 *.tmp
+.godot_runtime_tmp/

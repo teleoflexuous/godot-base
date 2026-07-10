@@ -102,7 +102,10 @@ func test_analytics_autoload_enables_gameanalytics_when_configured() -> void:
 		assert_true(true)
 		return
 	assert_true(Engine.has_singleton("GameAnalytics"), "GameAnalytics singleton should be available when the addon binaries are present for this platform.")
-	assert_true(Analytics.enabled, "Analytics should enable itself once override.cfg provides analytics keys and the GameAnalytics singleton loads.")
+	if DisplayServer.get_name() == "headless":
+		assert_false(Analytics.enabled, "Analytics SDK initialization should stay disabled during headless test runs.")
+	else:
+		assert_true(Analytics.enabled, "Analytics should enable itself once override.cfg provides analytics keys and the GameAnalytics singleton loads.")
 
 
 func test_web_export_preset_is_committed_for_ci_exports() -> void:
@@ -131,7 +134,11 @@ func test_itch_workflow_runs_tests_exports_web_and_deploys_from_main() -> void:
 	assert_true(workflow_text.contains("needs: validate_itch_setup"))
 	assert_true(workflow_text.contains("Write analytics override configuration"))
 	assert_true(workflow_text.contains("cat <<EOF > override.cfg"))
-	assert_true(workflow_text.contains("godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit"))
+	assert_true(workflow_text.contains("godot --headless --path . --import"))
+	assert_true(workflow_text.contains("Godot import reported script, autoload, or extension errors."))
+	assert_true(workflow_text.contains("godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd"))
+	assert_true(workflow_text.contains("godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration -ginclude_subdirs -gexit"))
+	assert_false(workflow_text.contains("-gdir=res://tests/performance"), "CI workflow should not run performance tests.")
 	assert_true(workflow_text.contains('godot --headless --path . --export-release "$WEB_EXPORT_PRESET" "$WEB_BUILD_DIR/index.html"'))
 	assert_true(workflow_text.contains('tee "$WEB_BUILD_DIR/export.log"'))
 	assert_true(workflow_text.contains("Set up Node"))
@@ -169,6 +176,8 @@ func test_release_automation_doc_lists_required_setup() -> void:
 	assert_true(doc_text.contains("Kind of project"))
 	assert_true(doc_text.contains("tools/web_smoke_check.cjs"))
 	assert_true(doc_text.contains("html/head_include"))
+	assert_true(doc_text.contains("run_ci_checks.ps1"))
+	assert_true(doc_text.contains("artifacts/web-ci"))
 	assert_true(doc_text.contains("This file will be played in the web browser"))
 	assert_true(doc_text.contains("playable in browser"))
 	assert_true(doc_text.contains("automatically replaces the embedded build"))

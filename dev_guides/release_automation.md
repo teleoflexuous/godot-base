@@ -37,8 +37,8 @@
 
 - `tests/unit/test_release_automation.gd` checks that the committed web export preset, fail-fast GitHub workflow, and required setup docs stay in sync.
 - The same test file also checks live runtime configuration so the default suite fails locally until itch and GameAnalytics settings are actually configured.
-- A passing default GUT run plus a successful local `godot --headless --path . --export-release "Web" "builds/web/index.html"` smoke export is the expected pre-push signal that the repository can update itch once GitHub variables, secrets, and `override.cfg` are present.
-- After exporting, run `node tools/web_smoke_check.cjs builds/web` from a Node environment with Playwright + Chromium installed. The script serves the build with COOP/COEP headers, verifies `crossOriginIsolated`, opens the exported page in desktop and mobile Chromium contexts, and fails if the game never reports ready or if browser console/page errors occur.
+- Run `pwsh -File tools/run_ci_checks.ps1` as the expected local pre-push signal. It runs import, warning preflight, the unit and integration GUT suites (performance tests are skipped to match the GitHub workflow), then a clean Web export to `artifacts/web-ci/`; its export log scan and required-file checks match the GitHub workflow's Godot/export validation.
+- After that export, run `node tools/web_smoke_check.cjs artifacts/web-ci` from a Node environment with Playwright + Chromium installed. The script serves the build with COOP/COEP headers, verifies `crossOriginIsolated`, opens the exported page in desktop and mobile Chromium contexts, and fails if the game never reports ready or if browser console/page errors occur.
 - A green GitHub Actions run means the repository was configured, the build exported, and the deploy job was eligible to push on `main`.
 - The export job also fails if Godot logs script parse/load errors or GDExtension load errors during export, if the expected GameAnalytics web artifacts are missing, or if the exported build cannot reach the runtime ready marker in real Chromium desktop + mobile browser runs.
 

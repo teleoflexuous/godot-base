@@ -5,6 +5,12 @@
 		"res://tests/performance/"
 	],
 	"include_subdirs": true,
+	"pre_run_script": "res://tests/support/gdscript_warning_preflight_hook.gd",
+	"failure_error_types": [
+		"engine",
+		"gut",
+		"push_error"
+	],
 	"prefix": "test_",
 	"suffix": ".gd",
 	"should_exit": true,

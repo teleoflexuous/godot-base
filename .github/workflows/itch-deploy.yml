@@ -103,7 +103,17 @@ jobs:
           GAMEANALYTICS_SECRET_KEY: ${{ secrets.GAMEANALYTICS_SECRET_KEY }}
           ITCH_DEPLOY_ENABLED: ${{ vars.ITCH_DEPLOY_ENABLED }}
           ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
-        run: godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit
+        run: |
+          set -o pipefail
+          godot --headless --path . --import 2>&1 | tee "$RUNNER_TEMP/godot-import.log"
+
+          if grep -Eq '(^SCRIPT ERROR:|Parse Error:|^ERROR: Failed to load script|^ERROR: Failed to instantiate an autoload|^ERROR: Error loading extension|^ERROR: Can.t open GDExtension dynamic library)' "$RUNNER_TEMP/godot-import.log"; then
+            echo "Godot import reported script, autoload, or extension errors." >&2
+            exit 1
+          fi
+
+          godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration -ginclude_subdirs -gexit
 
       - name: Export web build
         run: |

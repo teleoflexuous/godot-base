@@ -2,7 +2,7 @@
 
 ## Start Here
 
-- Check Godot 4.7 docs before and after implementing Godot behavior.
+- Check Godot 4.7 docs before and after implementing Godot behavior (Context7 library `/websites/godotengine_en_4_7`).
 - Read the smallest relevant project guide through `dev_guides/design_doc_index.md`.
 - Keep docs and tests minimal, current, and tied to the scenes/scripts they describe.
 - Treat `scenes/examples/` as reference material, not required architecture.
@@ -46,7 +46,16 @@
 
 ## Testing
 
+- Run a warnings/errors check before the suite (and before committing):
+  - Whole-project import check; surfaces parse errors and GDScript warnings, a non-zero exit or `SCRIPT ERROR` lines mean stop and fix first: `godot --headless --path . --import`
+  - Single-script parse check while iterating on one file: `godot --headless --path . --check-only --script res://path/to/script.gd`
+- GUT fails tests on errors by default: `failure_error_types` is pinned to `["engine", "gut", "push_error"]`, so engine errors, GUT-internal errors, and `push_error()` calls during a test fail that test. Do not add `-gerrors_do_not_cause_failure` or `-gno_error_tracking` unless intentionally suppressing.
+- GDScript warning levels live under `debug/gdscript/warnings/*` in project settings; inspect and manage them with GUT's warnings tool (`++` separates engine args from script args, see `addons/gut/cli/change_project_warnings.gd`):
+  - Print current: `godot --headless --path . -s addons/gut/cli/change_project_warnings.gd ++ -print current`
+  - Diff vs all-warn: `godot --headless --path . -s addons/gut/cli/change_project_warnings.gd ++ -diff current,all_warn`
+  - Apply all-warn (writes `project.godot`; restart Godot after): `godot --headless --path . -s addons/gut/cli/change_project_warnings.gd ++ -apply all_warn`
 - Default project suite: `godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit`.
 - Target unit tests while building: `godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit`.
 - Target integration tests after scene wiring: `godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/integration -gexit`.
 - Target performance tests after real-time, rendering, or loading work: `godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/performance -gexit`.
+- Local pre-push CI validation: `pwsh -File tools/run_ci_checks.ps1` (runs import, warning preflight, unit+integration GUT, and a clean Web export matching the GitHub workflow).
