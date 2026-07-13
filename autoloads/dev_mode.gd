@@ -1,6 +1,6 @@
 extends Node
 
-var enabled := false
+var enabled: bool = false
 var flags: Dictionary = {}
 
 func _ready() -> void:
@@ -18,4 +18,7 @@ func get_flag(flag_name: StringName, default_value: Variant = false) -> Variant:
 func is_enabled(flag_name: StringName = &"") -> bool:
 	if flag_name == &"":
 		return enabled
-	return enabled and bool(flags.get(flag_name, false))
+	if not enabled:
+		return false
+	var value: Variant = flags.get(flag_name, false)
+	return value == true

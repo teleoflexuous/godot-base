@@ -2,22 +2,22 @@ extends Node
 
 signal analytics_event_queued(event_name: String, data: Dictionary)
 
-const STARTUP_TIMEOUT_SEC := 20.0
+const STARTUP_TIMEOUT_SEC: float = 20.0
 
-var enabled := false
-var startup_ready := false
-var startup_stage := &"booting"
+var enabled: bool = false
+var startup_ready: bool = false
+var startup_stage: StringName = &"booting"
 
-var _boot_started_at_msec := 0
+var _boot_started_at_msec: int = 0
 var _pending_events: Array[Dictionary] = []
-var _sdk_initialized := false
+var _sdk_initialized: bool = false
 var _startup_watchdog: Timer
 
 
 func _project_setting_as_string(setting_path: String) -> String:
 	if not ProjectSettings.has_setting(setting_path):
 		return ""
-	var value = ProjectSettings.get_setting_with_override(setting_path)
+	var value: Variant = ProjectSettings.get_setting_with_override(setting_path)
 	return "" if value == null else str(value)
 
 
@@ -26,12 +26,13 @@ func _ready() -> void:
 	_start_startup_watchdog()
 
 	# Credentials are intentionally not stored in the base project.
-	var game_key := _project_setting_as_string("analytics/game_key")
-	var secret_key := _project_setting_as_string("analytics/secret_key")
-	var has_keys := game_key != "" and secret_key != ""
-	var has_singleton := Engine.has_singleton("GameAnalytics")
+	var game_key: String = _project_setting_as_string("analytics/game_key")
+	var secret_key: String = _project_setting_as_string("analytics/secret_key")
+	var has_keys: bool = game_key != "" and secret_key != ""
+	var has_singleton: bool = Engine.has_singleton("GameAnalytics")
 	enabled = has_keys and has_singleton
-	get_tree().node_added.connect(_on_tree_node_added)
+	if get_tree().node_added.connect(_on_tree_node_added) != OK:
+		push_warning("Analytics failed to connect SceneTree.node_added listener.")
 	call_deferred("_report_existing_main_scene_if_ready")
 
 	track_boot_stage("autoload_ready", {
@@ -43,21 +44,21 @@ func _ready() -> void:
 		"mobile": OS.has_feature("mobile"),
 	})
 	if not enabled:
-		var reason := "missing credentials and GameAnalytics singleton"
+		var reason: String = "missing credentials and GameAnalytics singleton"
 		if has_keys and not has_singleton:
 			reason = "GameAnalytics singleton unavailable"
 		elif has_singleton and not has_keys:
 			reason = "analytics credentials missing"
 		DebugLog.warn("Analytics disabled: %s." % reason)
 		return
-	var sdk := Engine.get_singleton("GameAnalytics")
+	var sdk: Object = Engine.get_singleton("GameAnalytics")
 	if sdk != null and sdk.has_method("configureBuild"):
-		sdk.configureBuild(_project_setting_as_string("application/config/version"))
+		sdk.call("configureBuild", _project_setting_as_string("application/config/version"))
 	if sdk != null and sdk.has_method("init"):
-		sdk.init(game_key, secret_key)
+		sdk.call("init", game_key, secret_key)
 		_sdk_initialized = true
 	elif sdk != null and sdk.has_method("initialize"):
-		sdk.initialize(game_key, secret_key)
+		sdk.call("initialize", game_key, secret_key)
 		_sdk_initialized = true
 	else:
 		DebugLog.warn("Analytics singleton is present but exposes no init method.")
@@ -80,14 +81,14 @@ func track_event(event_name: String, data: Dictionary = {}) -> void:
 
 func track_boot_stage(stage: String, data: Dictionary = {}) -> void:
 	startup_stage = StringName(stage)
-	var payload := _boot_payload(data)
+	var payload: Dictionary = _boot_payload(data)
 	payload["stage"] = stage
 	DebugLog.event("boot_stage", payload)
 	track_event("boot:%s" % stage, payload)
 
 
 func track_error(error_name: String, data: Dictionary = {}) -> void:
-	var payload := _boot_payload(data)
+	var payload: Dictionary = _boot_payload(data)
 	payload["error_name"] = error_name
 	DebugLog.error("Analytics boot error: %s %s" % [error_name, JSON.stringify(payload)])
 	track_event("boot_error:%s" % error_name, payload)
@@ -97,7 +98,7 @@ func report_main_scene_ready(scene_name: String, data: Dictionary = {}) -> void:
 	startup_ready = true
 	if _startup_watchdog != null:
 		_startup_watchdog.stop()
-	var payload := data.duplicate(true)
+	var payload: Dictionary = data.duplicate(true)
 	payload["scene_name"] = scene_name
 	payload["cross_origin_isolated"] = _get_web_bool("window.crossOriginIsolated === true")
 	payload["shared_array_buffer"] = _get_web_bool("typeof SharedArrayBuffer !== 'undefined'")
@@ -109,7 +110,8 @@ func _start_startup_watchdog() -> void:
 	_startup_watchdog = Timer.new()
 	_startup_watchdog.wait_time = STARTUP_TIMEOUT_SEC
 	_startup_watchdog.one_shot = true
-	_startup_watchdog.timeout.connect(_on_startup_watchdog_timeout)
+	if _startup_watchdog.timeout.connect(_on_startup_watchdog_timeout) != OK:
+		push_warning("Analytics failed to connect startup watchdog timeout.")
 	add_child(_startup_watchdog)
 	_startup_watchdog.start()
 
@@ -117,7 +119,7 @@ func _start_startup_watchdog() -> void:
 func _on_tree_node_added(node: Node) -> void:
 	if startup_ready:
 		return
-	var main_scene_path := _project_setting_as_string("application/run/main_scene")
+	var main_scene_path: String = _project_setting_as_string("application/run/main_scene")
 	if main_scene_path == "":
 		return
 	if node.scene_file_path != main_scene_path:
@@ -127,22 +129,23 @@ func _on_tree_node_added(node: Node) -> void:
 			"root_name": node.name,
 		})
 		return
-	node.ready.connect(func() -> void:
+	if node.ready.connect(func() -> void:
 		if startup_ready:
 			return
 		report_main_scene_ready(node.scene_file_path, {
 			"root_name": node.name,
 		})
-	, CONNECT_ONE_SHOT)
+	, CONNECT_ONE_SHOT) != OK:
+		push_warning("Analytics failed to connect node ready listener.")
 
 
 func _report_existing_main_scene_if_ready() -> void:
 	if startup_ready:
 		return
-	var current_scene := get_tree().current_scene
+	var current_scene: Node = get_tree().current_scene
 	if current_scene == null:
 		return
-	var main_scene_path := _project_setting_as_string("application/run/main_scene")
+	var main_scene_path: String = _project_setting_as_string("application/run/main_scene")
 	if current_scene.scene_file_path != main_scene_path:
 		return
 	report_main_scene_ready(current_scene.scene_file_path, {
@@ -160,7 +163,7 @@ func _on_startup_watchdog_timeout() -> void:
 
 
 func _boot_payload(data: Dictionary) -> Dictionary:
-	var payload := {
+	var payload: Dictionary = {
 		"boot_ms": Time.get_ticks_msec() - _boot_started_at_msec,
 		"engine_version": Engine.get_version_info().get("string", ""),
 		"game_version": _project_setting_as_string("application/config/version"),
@@ -173,18 +176,22 @@ func _boot_payload(data: Dictionary) -> Dictionary:
 
 
 func _flush_pending_events() -> void:
-	for pending_event in _pending_events:
-		_send_event(str(pending_event.get("event_name", "")), pending_event.get("data", {}))
+	for pending_event: Dictionary in _pending_events:
+		var event_name_value: String = str(pending_event.get("event_name", ""))
+		var data_value: Variant = pending_event.get("data", {})
+		if data_value is Dictionary:
+			var data_dict: Dictionary = data_value
+			_send_event(event_name_value, data_dict)
 	_pending_events.clear()
 
 
 func _send_event(event_name: String, data: Dictionary) -> void:
-	var sdk := Engine.get_singleton("GameAnalytics")
+	var sdk: Object = Engine.get_singleton("GameAnalytics")
 	if sdk != null and sdk.has_method("addDesignEvent"):
 		if data.is_empty():
-			sdk.addDesignEvent(event_name)
+			sdk.call("addDesignEvent", event_name)
 			return
-		sdk.addDesignEvent(event_name, {
+		sdk.call("addDesignEvent", event_name, {
 			"fields": JSON.stringify(data),
 		})
 
@@ -192,7 +199,7 @@ func _send_event(event_name: String, data: Dictionary) -> void:
 func _get_web_bool(expression: String) -> bool:
 	if not OS.has_feature("web"):
 		return false
-	var result = JavaScriptBridge.eval(expression, true)
+	var result: Variant = JavaScriptBridge.eval(expression, true)
 	return result == true
 
 

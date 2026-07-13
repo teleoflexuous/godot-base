@@ -2,10 +2,10 @@ extends Node
 
 signal quality_changed(quality: StringName)
 
-const SETTINGS_PATH := "user://settings.cfg"
-const SECTION := "graphics"
-const DEFAULT_QUALITY := &"balanced"
-const QUALITY_VALUES := [&"low", &"balanced", &"high"]
+const SETTINGS_PATH: String = "user://settings.cfg"
+const SECTION: String = "graphics"
+const DEFAULT_QUALITY: StringName = &"balanced"
+const QUALITY_VALUES: Array[StringName] = [&"low", &"balanced", &"high"]
 
 var quality: StringName = DEFAULT_QUALITY
 
@@ -29,20 +29,28 @@ func get_quality() -> StringName:
 
 
 func _load() -> void:
-	var config := ConfigFile.new()
+	var config: ConfigFile = ConfigFile.new()
 	if config.load(SETTINGS_PATH) != OK:
 		quality = DEFAULT_QUALITY
 		return
-	quality = StringName(config.get_value(SECTION, "quality", String(DEFAULT_QUALITY)))
+	var raw: Variant = config.get_value(SECTION, "quality", String(DEFAULT_QUALITY))
+	if raw is StringName:
+		quality = raw
+	elif raw is String:
+		var raw_str: String = raw
+		quality = StringName(raw_str)
+	else:
+		quality = DEFAULT_QUALITY
 	if not QUALITY_VALUES.has(quality):
 		quality = DEFAULT_QUALITY
 
 
 func _save() -> void:
-	var config := ConfigFile.new()
-	config.load(SETTINGS_PATH)
+	var config: ConfigFile = ConfigFile.new()
+	var _previous_state_loaded: int = config.load(SETTINGS_PATH)
 	config.set_value(SECTION, "quality", String(quality))
-	config.save(SETTINGS_PATH)
+	if config.save(SETTINGS_PATH) != OK:
+		push_warning("Failed to save graphics settings to %s" % SETTINGS_PATH)
 
 
 func _apply() -> void:

@@ -1,6 +1,6 @@
 extends Node
 
-const DEFAULT_CATEGORY := 0
+const DEFAULT_CATEGORY: int = 0
 
 func info(message: String) -> void:
 	_write("INFO", message)
@@ -21,8 +21,8 @@ func event(event_name: String, data: Dictionary = {}) -> void:
 
 
 func _write(level: String, message: String) -> void:
-	var formatted := "[%s] %s" % [level, message]
+	var formatted: String = "[%s] %s" % [level, message]
 	print(formatted)
-	var logger := get_node_or_null("/root/Log")
+	var logger: Node = get_node_or_null("/root/Log")
 	if logger != null and logger.has_method("entry"):
-		logger.entry(formatted, DEFAULT_CATEGORY)
+		logger.call("entry", formatted, DEFAULT_CATEGORY)
