@@ -1,10 +1,10 @@
 extends RefCounted
 class_name GraphicsQualityTiers
 
-const LOW := &"low"
-const BALANCED := &"balanced"
-const HIGH := &"high"
-const ALL := [LOW, BALANCED, HIGH]
+const LOW: StringName = &"low"
+const BALANCED: StringName = &"balanced"
+const HIGH: StringName = &"high"
+const ALL: Array[StringName] = [LOW, BALANCED, HIGH]
 
 static func is_valid_quality(value: StringName) -> bool:
 	return ALL.has(value)

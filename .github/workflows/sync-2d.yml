@@ -1,0 +1,21 @@
+name: Synchronize main into 2d
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open_sync_pr:
+    if: github.repository == 'teleoflexuous/godot-base'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh pr list --base 2d --head main --state open --json number --jq 'length > 0' | grep -q true; then exit 0; fi
+          gh pr create --base 2d --head main --title "chore: synchronize main into 2d" --body "Automated base synchronization. Resolve conflicts and merge after CI passes."

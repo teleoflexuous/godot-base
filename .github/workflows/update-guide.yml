@@ -1,0 +1,35 @@
+name: Check G.U.I.D.E updates
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    if: github.repository == 'teleoflexuous/godot-base'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "version=$(gh release view --repo godotneers/G.U.I.D.E --json tagName --jq .tagName)" >> "$GITHUB_OUTPUT"
+      - name: Update vendored addon when needed
+        if: steps.latest.outputs.version != 'v0.14.0'
+        env:
+          VERSION: ${{ steps.latest.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pwsh ./tools/update_guide.ps1 -Version "$VERSION"
+          git switch -C "automation/guide-update-$VERSION"
+          git add addons/guide third_party/guide.lock
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "chore: update G.U.I.D.E to $VERSION" || exit 0
+          git push --force origin HEAD
+          gh pr create --base main --head "automation/guide-update-$VERSION" --title "chore: update G.U.I.D.E to $VERSION" --body "Automated vendored dependency update; CI validates the committed release."

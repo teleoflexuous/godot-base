@@ -4,7 +4,11 @@ Keep this table in parity with scene/script/test changes. Update it when adding,
 
 | Component | Scene | Script | Docs | Tests | Completion |
 |---|---|---|---|---|---|
-| Game root | `scenes/game/game_root.tscn` | `scenes/game/game_root.gd` | `architecture.md`, `ui_architecture.md` | `tests/integration/test_example_scenes.gd` | Stubbed |
+| Game shell | `scenes/game/game_root.tscn` | `scenes/game/game_root.gd` | `architecture.md`, `ui_architecture.md` | `tests/integration/test_example_scenes.gd` | Implemented |
+| Game manager | n/a | `autoloads/game_manager.gd` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Implemented |
+| Scene manager | `autoloads/scene_manager.tscn` | `autoloads/scene_manager.gd` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Implemented |
+| Audio manager | n/a | `autoloads/audio_manager.gd` | `audio_settings.md` | `tests/unit/test_base_autoloads.gd` | Implemented |
+| 2D starters | `scenes/characters/`, `scenes/components/` | node-local scripts | `input_profiles.md` | `tests/integration/test_example_scenes.gd` | Implemented |
 | Example 2D scene | `scenes/examples/2d/example_2d_scene.tscn` | n/a | `architecture.md`, `scene_node_guide.md` | `tests/integration/test_example_scenes.gd` | Example |
 | Example 3D scene | `scenes/examples/3d/example_3d_scene.tscn` | n/a | `architecture.md`, `scene_node_guide.md` | `tests/integration/test_example_scenes.gd` | Example |
 | Debug logging | n/a | `autoloads/debug_log.gd`, optional `addons/GoLogger/Log.tscn` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Stubbed |

@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3]
+[ext_resource type="FontFile" path="res://assets/fonts/Cinzel[wght].ttf" id="1"]
+[resource]
+default_font = ExtResource("1")
+default_font_size = 17
+Label/colors/font_color = Color(0.95, 0.87, 0.64, 1)
+Title/base_type = &"Label"
+Title/font_sizes/font_size = 30

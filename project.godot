@@ -20,9 +20,13 @@ config/icon="res://icon.svg"
 
 DebugLog="*res://autoloads/debug_log.gd"
 DevMode="*res://autoloads/dev_mode.gd"
+GameManager="*res://autoloads/game_manager.gd"
+SceneManager="*res://autoloads/scene_manager.tscn"
+AudioManager="*res://autoloads/audio_manager.gd"
 AudioSettings="*res://autoloads/audio_settings.gd"
 GraphicsSettings="*res://autoloads/graphics_settings.gd"
 Analytics="*res://autoloads/analytics.gd"
+GUIDE="*res://addons/guide/guide.gd"
 
 [debug]
 
@@ -56,7 +60,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/GameAnalytics/plugin.cfg")
+enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/GameAnalytics/plugin.cfg", "res://addons/guide/plugin.cfg")
 
 [importer_defaults]
 
@@ -68,6 +72,55 @@ texture={
 }
 
 [input]
+
+move_left={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":65), Object(InputEventKey,"physical_keycode":4194311), Object(InputEventJoypadMotion,"axis":0,"axis_value":-1.0)]
+}
+move_right={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":68), Object(InputEventKey,"physical_keycode":4194313), Object(InputEventJoypadMotion,"axis":0,"axis_value":1.0)]
+}
+move_up={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":87), Object(InputEventKey,"physical_keycode":4194320), Object(InputEventJoypadMotion,"axis":1,"axis_value":-1.0)]
+}
+move_down={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":83), Object(InputEventKey,"physical_keycode":4194322), Object(InputEventJoypadMotion,"axis":1,"axis_value":1.0)]
+}
+jump={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":32), Object(InputEventJoypadButton,"button_index":0)]
+}
+interact={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":69), Object(InputEventJoypadButton,"button_index":0)]
+}
+pause={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194305), Object(InputEventJoypadButton,"button_index":11)]
+}
+pointer_primary={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"button_index":1)]
+}
+pointer_secondary={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"button_index":2)]
+}
+debug_toggle_overlay={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194322)]
+}
+debug_skip_scene={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194323)]
+}
+debug_toggle_invincibility={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194324)]
+}
 
 ui_accept={
 "deadzone": 0.5,

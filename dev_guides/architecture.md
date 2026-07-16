@@ -11,8 +11,8 @@
 
 | Layer | Path | Responsibility |
 |---|---|---|
-| Root composition | `scenes/game/game_root.tscn` | Wires the first playable scene or menu and global UI shell |
-| Autoload settings | `autoloads/audio_settings.gd`, `autoloads/graphics_settings.gd`, `autoloads/dev_mode.gd` | Persisted settings and development flags |
+| Root composition | `scenes/game/game_root.tscn` | Wires the replaceable gameplay host, menus, settings, and debug overlay |
+| Autoload services | `autoloads/game_manager.gd`, `autoloads/scene_manager.tscn`, `autoloads/audio_manager.gd` | State, fades, and audio playback/settings |
 | Logging | `autoloads/debug_log.gd`, `addons/GoLogger/` | Console logging by default; optional GoLogger file logging when a project enables/configures it |
 | Analytics | `autoloads/analytics.gd`, `addons/GameAnalytics/` | Inert-by-default analytics facade; credentials are per project |
 | Examples | `scenes/examples/2d/`, `scenes/examples/3d/` | Disposable reference scenes for future projects |

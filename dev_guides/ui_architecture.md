@@ -8,8 +8,8 @@
 
 ## Base UI
 
-- `scenes/game/game_root.tscn` is a minimal shell, not a mandatory game UI architecture.
-- Future projects should replace or expand the root scene with their own start menu, gameplay viewport, HUD, and settings flow.
+- `scenes/game/game_root.tscn` supplies a replaceable main-menu → game → pause → game-over/win flow plus settings and debug overlay.
+- Projects should replace the game-host panel with their gameplay viewport, preserving the `GameManager` state boundary where useful.
 - Keep UI examples small enough that deleting them is safe.
 
 ## ProperUI Decision Points

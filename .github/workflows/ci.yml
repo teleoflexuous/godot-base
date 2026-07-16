@@ -1,0 +1,70 @@
+name: Base validation and optional release
+
+on:
+  pull_request:
+  push:
+    branches: [main, 2d]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.7-stable
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    outputs:
+      release_target: ${{ steps.target.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+      - name: Enforce generated-project initialization
+        run: godot --headless --path . -s res://tools/verify_template_lifecycle.gd -- --source-repository="${{ github.repository }}"
+      - id: target
+        run: echo "value=$(sed -n 's/^release_target="\(.*\)"/\1/p' template_project.cfg)" >> "$GITHUB_OUTPUT"
+
+  base_ci:
+    needs: lifecycle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          export-templates: true
+          cache: true
+      - name: Import and validate scripts
+        run: |
+          godot --headless --path . --import
+          godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration -ginclude_subdirs -gexit
+      - name: Credential-free web export
+        run: godot --headless --path . --export-release Web builds/web/index.html
+
+  release_readiness:
+    needs: [lifecycle, base_ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.lifecycle.outputs.release_target == 'itch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require configured itch release credentials
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
+          GAMEANALYTICS_GAME_KEY: ${{ secrets.GAMEANALYTICS_GAME_KEY }}
+          GAMEANALYTICS_SECRET_KEY: ${{ secrets.GAMEANALYTICS_SECRET_KEY }}
+        run: |
+          test -n "$BUTLER_API_KEY"
+          test -n "$ITCH_PROJECT"
+          test -n "$GAMEANALYTICS_GAME_KEY"
+          test -n "$GAMEANALYTICS_SECRET_KEY"
+
+  deploy_itch:
+    needs: release_readiness
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Release readiness passed. Project-specific itch deployment belongs here."
