@@ -45,7 +45,9 @@ jobs:
           godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd
           godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration -ginclude_subdirs -gexit
       - name: Credential-free web export
-        run: godot --headless --path . --export-release Web builds/web/index.html
+        run: |
+          mkdir -p builds/web
+          godot --headless --path . --export-release Web builds/web/index.html
 
   release_readiness:
     needs: [lifecycle, base_ci]
