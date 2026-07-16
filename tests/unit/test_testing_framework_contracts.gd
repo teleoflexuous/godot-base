@@ -8,7 +8,7 @@ const PREFLIGHT_HOOK_PATH := "res://tests/support/gdscript_warning_preflight_hoo
 const PREFLIGHT_RUNNER_PATH := "res://tools/run_gdscript_warning_preflight.gd"
 const LOCAL_CI_RUNNER_PATH := "res://tools/run_ci_checks.ps1"
 const TESTING_DOC_PATH := "res://dev_guides/testing_strategy.md"
-const WORKFLOW_PATH := "res://.github/workflows/itch-deploy.yml"
+const WORKFLOW_PATH := "res://.github/workflows/ci.yml"
 
 
 func test_gut_config_runs_strict_warning_preflight() -> void:
