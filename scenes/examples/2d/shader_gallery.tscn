@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://resources/shaders/screen_fx.gdshader" id="1"]
+
+[node name="ShaderGallery" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 900.0
+offset_bottom = 70.0
+text = "2D Shader Gallery: outline, hit flash, dissolve, palette recolor, hologram UI, water, fog, foliage sway, wipe, screen FX"
+autowrap_mode = 3
+
+[node name="ScreenFxPreview" type="ColorRect" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 110.0
+offset_right = 450.0
+offset_bottom = 350.0
+material = null
+color = Color(0.08, 0.15, 0.24, 1)
+
+[node name="ShaderReference" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 380.0
+offset_right = 900.0
+offset_bottom = 520.0
+text = "Attach individual shaders from res://resources/shaders to Sprite2D or ColorRect materials. Screen FX is intended for one full-screen ColorRect only."
+autowrap_mode = 3
