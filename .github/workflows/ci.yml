@@ -25,7 +25,9 @@ jobs:
       - name: Enforce generated-project initialization
         run: godot --headless --path . -s res://tools/verify_template_lifecycle.gd -- --source-repository="${{ github.repository }}"
       - id: target
-        run: echo "value=$(sed -n 's/^release_target="\(.*\)"/\1/p' template_project.cfg)" >> "$GITHUB_OUTPUT"
+        run: |
+          release_target=$(awk -F'"' '/^release_target=/{print $2}' template_project.cfg)
+          echo "value=$release_target" >> "$GITHUB_OUTPUT"
 
   base_ci:
     needs: lifecycle
