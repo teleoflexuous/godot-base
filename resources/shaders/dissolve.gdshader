@@ -9,6 +9,8 @@ void fragment() {
 	vec4 base = texture(TEXTURE, UV) * COLOR;
 	float noise = texture(noise_texture, UV).r;
 	float visible = step(threshold, noise);
-	float edge = smoothstep(threshold, threshold + edge_width, noise) - visible;
-	COLOR = mix(vec4(edge_color.rgb, edge_color.a * edge), base, visible);
+	float edge = visible * (1.0 - smoothstep(threshold, threshold + max(edge_width, 0.0001), noise));
+	base.rgb = mix(base.rgb, edge_color.rgb, edge);
+	base.a *= visible;
+	COLOR = base;
 }
