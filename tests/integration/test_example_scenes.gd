@@ -23,6 +23,14 @@ func test_example_2d_scene_loads() -> void:
 	assert_not_null(scene.get_node_or_null("Ground/CollisionShape2D"))
 
 
+func test_shader_gallery_loads_when_2d_assets_are_present() -> void:
+	var path: String = "res://scenes/examples/2d/shader_gallery.tscn"
+	if not ResourceLoader.exists(path):
+		return
+	var packed_scene: PackedScene = load(path)
+	assert_not_null(packed_scene)
+
+
 func test_example_3d_scene_loads() -> void:
 	var packed_scene: PackedScene = load("res://scenes/examples/3d/example_3d_scene.tscn")
 	assert_not_null(packed_scene)
