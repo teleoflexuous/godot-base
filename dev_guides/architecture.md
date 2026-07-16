@@ -42,7 +42,7 @@
 
 ## Settings Boundary
 
-- `AudioSettings` persists bus volume values to `user://settings.cfg`.
+- `AudioSettings` persists master, music, and effects volume values to `user://settings.cfg`; see `dev_guides/audio_settings.md` for the bus-routing contract.
 - `GraphicsSettings` persists a simple `low` / `balanced` / `high` quality value.
 - `DevMode` defaults to `OS.is_debug_build()` and can hold project-local debug flags.
 
