@@ -17,7 +17,8 @@ func test_template_ci_enforces_lifecycle_but_keeps_canonical_source_valid() -> v
 	assert_true(workflow.contains("release_readiness:"))
 	assert_true(workflow.contains("Credential-free web export"))
 	assert_false(workflow.contains("ITCH_DEPLOY_ENABLED"))
-	assert_true(workflow.contains("res://addons/camera_rigs/tests"))
+	assert_true(workflow.contains("res://addons/proper_camera/tests"))
+	assert_true(workflow.contains("res://addons/proper_camera_guide/tests"))
 
 
 func test_template_requires_an_explicit_input_capability_choice() -> void:

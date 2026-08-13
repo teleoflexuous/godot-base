@@ -1,0 +1,11 @@
+{
+  "name": "proper_camera",
+  "version": "1.0.2",
+  "godot": "4.7",
+  "runtime": ["scenes/", "runtime/", "presets/"],
+  "source_only": ["examples/", "docs/", "tests/"],
+  "dependencies": {
+    "guide": "optional companion integration",
+    "phantom_camera": "optional; compatibility-tested v0.11.0.3"
+  }
+}

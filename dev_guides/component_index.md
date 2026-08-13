@@ -11,7 +11,8 @@ Keep this table in parity with scene/script/test changes. Update it when adding,
 | 2D starters | `scenes/characters/`, `scenes/components/` | node-local scripts | `input_profiles.md` | `tests/integration/test_example_scenes.gd` | Implemented |
 | Example 2D scene | `scenes/examples/2d/example_2d_scene.tscn` | n/a | `architecture.md`, `scene_node_guide.md` | `tests/integration/test_example_scenes.gd` | Example |
 | Example 3D scene | `scenes/examples/3d/example_3d_scene.tscn` | n/a | `architecture.md`, `scene_node_guide.md` | `tests/integration/test_example_scenes.gd` | Example |
-| Camera rigs | `addons/camera_rigs/scenes/` | `addons/camera_rigs/runtime/` | `camera_addon.md`, addon README | `addons/camera_rigs/tests/` | Implemented |
+| ProperCamera rigs | `addons/proper_camera/scenes/` | `addons/proper_camera/runtime/` | `camera_addon.md`, addon README | `addons/proper_camera/tests/` | Vendored |
+| ProperCamera GUIDE companion | `addons/proper_camera_guide/` | `addons/proper_camera_guide/runtime/` | `camera_addon.md` | `addons/proper_camera_guide/tests/` | Base-only |
 | Input capability settings | n/a | `autoloads/input_settings.gd`, `scripts/input/input_capabilities.gd` | `input_profiles.md`, `template_lifecycle.md` | `tests/unit/test_input_capabilities.gd` | Implemented |
 | Camera preferences | n/a | `autoloads/camera_settings.gd` | `camera_addon.md` | addon settings tests | Implemented |
 | Debug logging | n/a | `autoloads/debug_log.gd`, optional `addons/GoLogger/Log.tscn` | `architecture.md` | `tests/unit/test_base_autoloads.gd` | Stubbed |

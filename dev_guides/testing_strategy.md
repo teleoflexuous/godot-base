@@ -9,7 +9,7 @@
 
 ## CI / Workflow Scope
 
-- GitHub Actions (`.github/workflows/ci.yml`) and the local CI helper (`tools/run_ci_checks.ps1`) run `res://tests/unit/`, `res://tests/integration/`, and `res://addons/camera_rigs/tests/` via `-gdir`, and pass `-ginclude_subdirs`. Performance tests are excluded from workflow runs because tiered FPS budgets are not reliable on shared CI runners.
+- GitHub Actions (`.github/workflows/ci.yml`) and the local CI helper (`tools/run_ci_checks.ps1`) run `res://tests/unit/`, `res://tests/integration/`, `res://addons/proper_camera/tests/`, and `res://addons/proper_camera_guide/tests/` via `-gdir`, and pass `-ginclude_subdirs`. Performance tests are excluded from workflow runs because tiered FPS budgets are not reliable on shared CI runners.
 - Performance tests remain part of `.gutconfig.json`, so a local default run (`godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit`) still includes them. Run them on demand with the performance-only command below when changing real-time, rendering, or loading code.
 
 ## Test Split
@@ -55,10 +55,10 @@ GUT fails tests on errors by default: `failure_error_types` is pinned to `["engi
 
 `.gutconfig.json` also runs `res://tests/support/gdscript_warning_preflight_hook.gd` as `pre_run_script`. That hook reloads project scripts under `autoloads/`, `scenes/`, `scripts/`, and `tools/` with cache ignored and GDScript warnings as errors before normal tests run. This catches parser warnings such as native method signature conflicts even when GUT collection would otherwise load test scripts with warnings disabled.
 
-The warning preflight additionally scans `addons/camera_rigs/`. Run its focused suite with:
+The warning preflight additionally scans `addons/proper_camera/` and the base-only `addons/proper_camera_guide/`. Run the vendored suite with:
 
 ```text
-Godot_v4.7-stable_win64_console.exe --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/camera_rigs/tests -ginclude_subdirs -gexit
+Godot_v4.7-stable_win64_console.exe --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/proper_camera/tests,res://addons/proper_camera_guide/tests -ginclude_subdirs -gexit
 ```
 
 GDScript warning levels live under `debug/gdscript/warnings/*` in project settings; inspect and manage them with GUT's warnings tool (`++` separates engine args from script args, see `addons/gut/cli/change_project_warnings.gd`):

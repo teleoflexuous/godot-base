@@ -13,7 +13,7 @@
 | Need | Preferred Nodes |
 |---|---|
 | Root gameplay surface | `Node2D` |
-| Camera | `Camera2D`, or `addons/camera_rigs/scenes/camera_rig_2d.tscn` for follow/pan/zoom |
+| Camera | `Camera2D`, or `addons/proper_camera/scenes/camera_rig_2d.tscn` for follow/pan/zoom |
 | Static collision | `StaticBody2D` + `CollisionShape2D` |
 | Moving actor | `CharacterBody2D` or scene-local `Node2D` depending on physics needs |
 | UI overlay | `CanvasLayer` + `Control` scenes |

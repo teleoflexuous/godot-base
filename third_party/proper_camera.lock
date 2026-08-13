@@ -1,0 +1,5 @@
+repository=https://github.com/teleoflexuous/GodotCamera.git
+commit=4994eb5b1c8a4f749998d319e720fc9e2650990e
+addon_path=addons/proper_camera
+version=1.0.2
+license=MIT

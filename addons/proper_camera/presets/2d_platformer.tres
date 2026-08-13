@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="ProperCameraPreset2D" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/proper_camera/runtime/core/camera_preset_2d.gd" id="1_preset"]
+
+[resource]
+script = ExtResource("1_preset")
+follow_enabled = true
+follow_interruption = 0
+follow_smoothing_speed = 8.0
+horizontal_follow_smoothing_speed = 8.0
+vertical_follow_smoothing_speed = 5.0
+dead_zone = Vector2(160, 80)
+look_ahead_distance = Vector2(120, 32)
+look_ahead_smoothing_speed = 6.0
+pan_enabled = false
+pan_speed = 600.0
+look_enabled = true
+peek_distance = 96.0
+peek_smoothing_speed = 8.0
+edge_scroll_enabled = false
+edge_scroll_margin = 24.0
+zoom_enabled = false
+min_zoom = 0.75
+max_zoom = 1.5
+zoom_step_size = 0.1
+zoom_smoothing_speed = 10.0
+zoom_anchor = 1
+bounds_enabled = false
+bounds = Rect2(-2000, -2000, 4000, 4000)
+bounds_margin = Vector2(0, 0)

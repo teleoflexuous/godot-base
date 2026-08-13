@@ -11,7 +11,7 @@
 | `gamepad` | Gamepad only |
 | `custom` | Any explicitly selected bitmask |
 
-Camera genre/preset and devices are separate decisions. `CameraGuideDefaultsBuilder` creates semantic actions and one mapping context per device family. The owning scene routes the saved mask into `CameraGuideContextRouter`, selects only the active camera genre, and disables camera contexts for pause, menus, cutscenes, and inactive local cameras. The router never calls GUIDE's unrelated-context replacement APIs.
+Camera genre/preset and devices are separate decisions. `ProperCameraGuideDefaultsBuilder` creates semantic actions and one mapping context per device family. The owning scene routes the saved mask into `ProperCameraGuideContextRouter`, selects only the active camera genre, and disables camera contexts for pause, menus, cutscenes, and inactive local cameras. The router never calls GUIDE's unrelated-context replacement APIs.
 
 Mouse/touch deltas and keyboard/stick rates remain distinct at the adapter boundary. Touch pinch/twist actions are cumulative from gesture start and are fixed because GUIDE v0.14 cannot detect touch remaps. Button slots composing camera axes override action remapping metadata so keys and mouse-wheel buttons can be rebound. Prompt UI should use the active-context formatter and refresh on GUIDE mapping changes.
 

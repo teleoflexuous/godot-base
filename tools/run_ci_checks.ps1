@@ -36,7 +36,7 @@ if ($importOutput -match "(?m)(^SCRIPT ERROR:|Parse Error:|^ERROR: Failed to loa
 $preflightLog = Join-Path $artifactsDirectory "godot-ci-preflight.log"
 $gutLog = Join-Path $artifactsDirectory "godot-ci-gut.log"
 Invoke-GodotCheck @("--headless", "--log-file", $preflightLog, "--path", ".", "-s", "res://tools/run_gdscript_warning_preflight.gd")
-Invoke-GodotCheck @("--headless", "--log-file", $gutLog, "--path", ".", "-s", "res://addons/gut/gut_cmdln.gd", "-gdir=res://tests/unit,res://tests/integration,res://tests/performance,res://addons/camera_rigs/tests", "-ginclude_subdirs", "-gexit")
+Invoke-GodotCheck @("--headless", "--log-file", $gutLog, "--path", ".", "-s", "res://addons/gut/gut_cmdln.gd", "-gdir=res://tests/unit,res://tests/integration,res://tests/performance,res://addons/proper_camera/tests,res://addons/proper_camera_guide/tests", "-ginclude_subdirs", "-gexit")
 
 $webBuildDirectory = Join-Path $artifactsDirectory "web-ci"
 $webExportLog = Join-Path $artifactsDirectory "godot-ci-web-export.log"

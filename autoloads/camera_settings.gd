@@ -1,25 +1,25 @@
 extends Node
 
-signal preferences_changed(preferences: CameraUserPreferences)
+signal preferences_changed(preferences: ProperCameraUserPreferences)
 
 const SETTINGS_PATH: String = "user://settings.cfg"
 const SECTION: String = "camera"
 
-var preferences: CameraUserPreferences = CameraUserPreferences.new()
+var preferences: ProperCameraUserPreferences = ProperCameraUserPreferences.new()
 
 
 func _ready() -> void:
 	load_settings()
 
 
-func get_preferences() -> CameraUserPreferences:
+func get_preferences() -> ProperCameraUserPreferences:
 	return preferences
 
 
-func replace_preferences(next_preferences: CameraUserPreferences, persist: bool = true) -> bool:
+func replace_preferences(next_preferences: ProperCameraUserPreferences, persist: bool = true) -> bool:
 	if next_preferences == null:
 		return false
-	preferences = next_preferences.duplicate(true) as CameraUserPreferences
+	preferences = next_preferences.duplicate(true) as ProperCameraUserPreferences
 	preferences.sanitize()
 	if persist and not save_settings():
 		return false
@@ -36,7 +36,7 @@ func update_values(values: Dictionary, persist: bool = true) -> bool:
 
 
 func reset_defaults(persist: bool = true) -> bool:
-	preferences = CameraUserPreferences.new()
+	preferences = ProperCameraUserPreferences.new()
 	if persist and not save_settings():
 		return false
 	preferences_changed.emit(preferences)
@@ -44,7 +44,7 @@ func reset_defaults(persist: bool = true) -> bool:
 
 
 func load_settings(path: String = SETTINGS_PATH) -> void:
-	preferences = CameraUserPreferences.new()
+	preferences = ProperCameraUserPreferences.new()
 	var config: ConfigFile = ConfigFile.new()
 	if config.load(path) != OK:
 		return

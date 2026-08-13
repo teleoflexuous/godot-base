@@ -1,0 +1,11 @@
+{
+  "name": "proper_camera_guide",
+  "version": "1.0.2-base",
+  "godot": "4.7",
+  "runtime": ["runtime/", "scenes/"],
+  "tests": ["tests/"],
+  "dependencies": {
+    "proper_camera": "vendored exact snapshot",
+    "guide": "vendored G.U.I.D.E. v0.14.0"
+  }
+}

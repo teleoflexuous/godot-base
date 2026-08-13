@@ -43,7 +43,7 @@ jobs:
         run: |
           godot --headless --path . --import
           godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd
-          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration,res://tests/performance,res://addons/camera_rigs/tests -ginclude_subdirs -gexit
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration,res://tests/performance,res://addons/proper_camera/tests,res://addons/proper_camera_guide/tests -ginclude_subdirs -gexit
       - name: Credential-free web export
         run: |
           mkdir -p builds/web
@@ -65,7 +65,7 @@ jobs:
       - name: Import and run pinned bridge contracts
         run: |
           godot --headless --path . --import
-          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/camera_rigs/tests -ginclude_subdirs -gexit
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/proper_camera/tests -ginclude_subdirs -gexit
 
   release_readiness:
     needs: [lifecycle, base_ci]
