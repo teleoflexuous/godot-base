@@ -27,7 +27,8 @@ func _init() -> void:
 		return
 	var state: String = str(config.get_value("project", "state", "template"))
 	var release_target: String = str(config.get_value("project", "release_target", "unconfigured"))
-	var input_capability_set: bool = bool(config.get_value("project", "input_capability_set", false))
+	var input_capability_value: Variant = config.get_value("project", "input_capability_set", false)
+	var input_capability_set: bool = input_capability_value == true
 	var input_capability: String = str(config.get_value("project", "input_capability", "all"))
 	if (
 		state != "configured"
