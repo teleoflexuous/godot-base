@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CameraPreset3D" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/camera_rigs/runtime/core/camera_preset_3d.gd" id="1"]
+
+[resource]
+resource_name = "3D RTS MOBA"
+script = ExtResource("1")
+follow_enabled = true
+follow_interruption = 2
+follow_smoothing_speed = 10.0
+target_offset = Vector3(0, 0, 0)
+pan_enabled = true
+pan_speed = 22.0
+look_enabled = false
+look_sensitivity = 0.008
+min_pitch_degrees = -58.0
+max_pitch_degrees = -58.0
+starting_pitch_degrees = -58.0
+starting_yaw_degrees = 45.0
+edge_scroll_enabled = true
+edge_scroll_margin = 20.0
+zoom_mechanism = 0
+zoom_anchor = 3
+min_distance = 12.0
+max_distance = 35.0
+min_fov = 60.0
+max_fov = 60.0
+zoom_step_size = 0.06
+zoom_smoothing_speed = 12.0
+pitch_policy = 0
+view_policy = 0
+occlusion_mode = 1
+collision_mask = 1
+collision_margin = 0.08
+collision_recovery_speed = 7.0
+bounds_enabled = false
+terrain_clearance_enabled = true
+minimum_terrain_clearance = 1.0

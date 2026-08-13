@@ -22,3 +22,5 @@
 - `project.godot` defaults to Forward Plus and D3D12 on Windows.
 - `GraphicsSettings` exposes low, balanced, and high tiers as a small starting point.
 - Projects should define their own quality tiers before shipping 3D-heavy scenes.
+- Camera active-occlusion search is query-budgeted per physics tick; leave it disabled for management/RTS presets unless the game validates the cost.
+- Camera occluder trackers and detail bindings use explicit target lists and cached connections. Avoid per-frame scene-tree discovery in production content.

@@ -43,11 +43,29 @@ jobs:
         run: |
           godot --headless --path . --import
           godot --headless --path . -s res://tools/run_gdscript_warning_preflight.gd
-          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration -ginclude_subdirs -gexit
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests/unit,res://tests/integration,res://tests/performance,res://addons/camera_rigs/tests -ginclude_subdirs -gexit
       - name: Credential-free web export
         run: |
           mkdir -p builds/web
           godot --headless --path . --export-release Web builds/web/index.html
+
+  phantom_camera_compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+      - name: Stage pinned Phantom Camera without shipping it
+        run: |
+          git clone https://github.com/ramokz/phantom-camera.git /tmp/phantom-camera
+          git -C /tmp/phantom-camera checkout cb6e0966ac305202c47f1d1a81c105966e29da96
+          test "$(git -C /tmp/phantom-camera rev-parse HEAD)" = "cb6e0966ac305202c47f1d1a81c105966e29da96"
+          cp -R /tmp/phantom-camera/addons/phantom_camera addons/phantom_camera
+      - name: Import and run pinned bridge contracts
+        run: |
+          godot --headless --path . --import
+          godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/camera_rigs/tests -ginclude_subdirs -gexit
 
   release_readiness:
     needs: [lifecycle, base_ci]

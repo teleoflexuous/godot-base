@@ -2,14 +2,14 @@
 
 ## Default GUT Scope
 
-- `.gutconfig.json` includes project tests only:
+- `.gutconfig.json` includes project tests:
 - `res://tests/unit/`
 - `res://tests/integration/`
 - `res://tests/performance/`
 
 ## CI / Workflow Scope
 
-- GitHub Actions (`.github/workflows/itch-deploy.yml`) and the local CI helper (`tools/run_ci_checks.ps1`) run only `res://tests/unit/` and `res://tests/integration/` via `-gdir`, and pass `-ginclude_subdirs`. Performance tests are excluded from workflow runs because tiered FPS budgets are not reliable on shared CI runners.
+- GitHub Actions (`.github/workflows/ci.yml`) and the local CI helper (`tools/run_ci_checks.ps1`) run `res://tests/unit/`, `res://tests/integration/`, and `res://addons/camera_rigs/tests/` via `-gdir`, and pass `-ginclude_subdirs`. Performance tests are excluded from workflow runs because tiered FPS budgets are not reliable on shared CI runners.
 - Performance tests remain part of `.gutconfig.json`, so a local default run (`godot --headless --path . -s res://addons/gut/gut_cmdln.gd -gexit`) still includes them. Run them on demand with the performance-only command below when changing real-time, rendering, or loading code.
 
 ## Test Split
@@ -17,7 +17,7 @@
 - `tests/unit/`: pure scripts, autoload contracts, and formatting helpers.
 - `tests/integration/`: scene loading, node wiring, and multi-system contracts.
 - `tests/performance/`: startup, turn/update loops, loading, and rendering-adjacent budgets.
-- Addon-local tests should live under `addons/<addon>/tests/` and be run directly when that addon changes.
+- Addon-local tests should live under `addons/<addon>/tests/` and be run directly when that addon changes. Camera rigs are part of the base contract and therefore also run in local/GitHub CI.
 
 ## Recommended Commands
 
@@ -54,6 +54,12 @@ Godot_v4.7-stable_win64_console.exe --headless --log-file artifacts/godot-check.
 GUT fails tests on errors by default: `failure_error_types` is pinned to `["engine", "gut", "push_error"]`, so engine errors, GUT-internal errors, and `push_error()` calls during a test fail that test. Do not add `-gerrors_do_not_cause_failure` or `-gno_error_tracking` unless intentionally suppressing.
 
 `.gutconfig.json` also runs `res://tests/support/gdscript_warning_preflight_hook.gd` as `pre_run_script`. That hook reloads project scripts under `autoloads/`, `scenes/`, `scripts/`, and `tools/` with cache ignored and GDScript warnings as errors before normal tests run. This catches parser warnings such as native method signature conflicts even when GUT collection would otherwise load test scripts with warnings disabled.
+
+The warning preflight additionally scans `addons/camera_rigs/`. Run its focused suite with:
+
+```text
+Godot_v4.7-stable_win64_console.exe --headless --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://addons/camera_rigs/tests -ginclude_subdirs -gexit
+```
 
 GDScript warning levels live under `debug/gdscript/warnings/*` in project settings; inspect and manage them with GUT's warnings tool (`++` separates engine args from script args, see `addons/gut/cli/change_project_warnings.gd`):
 

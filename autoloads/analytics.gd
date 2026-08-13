@@ -119,38 +119,33 @@ func _start_startup_watchdog() -> void:
 func _on_tree_node_added(node: Node) -> void:
 	if startup_ready:
 		return
-	var main_scene_path: String = _project_setting_as_string("application/run/main_scene")
-	if main_scene_path == "":
-		return
-	if node.scene_file_path != main_scene_path:
+	if node.get_parent() != get_tree().root or node.scene_file_path.is_empty():
 		return
 	if node.is_node_ready():
-		report_main_scene_ready(node.scene_file_path, {
-			"root_name": node.name,
-		})
+		_report_startup_scene_ready(node, node.scene_file_path)
 		return
 	if node.ready.connect(func() -> void:
 		if startup_ready:
 			return
-		report_main_scene_ready(node.scene_file_path, {
-			"root_name": node.name,
-		})
+		_report_startup_scene_ready(node, node.scene_file_path)
 	, CONNECT_ONE_SHOT) != OK:
-		push_warning("Analytics failed to connect node ready listener.")
+		push_warning("Analytics failed to connect startup scene ready listener.")
+
+
+func _report_startup_scene_ready(scene: Node, scene_path: String) -> void:
+	report_main_scene_ready(scene_path, {
+		"root_name": scene.name,
+		"configured_main_scene": scene_path == _project_setting_as_string("application/run/main_scene"),
+	})
 
 
 func _report_existing_main_scene_if_ready() -> void:
 	if startup_ready:
 		return
 	var current_scene: Node = get_tree().current_scene
-	if current_scene == null:
+	if current_scene == null or current_scene.scene_file_path.is_empty():
 		return
-	var main_scene_path: String = _project_setting_as_string("application/run/main_scene")
-	if current_scene.scene_file_path != main_scene_path:
-		return
-	report_main_scene_ready(current_scene.scene_file_path, {
-		"root_name": current_scene.name,
-	})
+	_report_startup_scene_ready(current_scene, current_scene.scene_file_path)
 
 
 func _on_startup_watchdog_timeout() -> void:

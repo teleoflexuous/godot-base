@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://addons/camera_rigs/examples/camera_demo_2d.gd" id="1_demo"]
+[ext_resource type="PackedScene" path="res://addons/camera_rigs/scenes/camera_rig_2d.tscn" id="2_rig"]
+[ext_resource type="Resource" path="res://addons/camera_rigs/presets/2d_platformer.tres" id="3_preset"]
+[ext_resource type="Script" path="res://addons/camera_rigs/runtime/input/camera_input_map_adapter.gd" id="4_input"]
+
+[node name="Platformer2DExample" type="Node2D"]
+script = ExtResource("1_demo")
+target_path = NodePath("Player")
+platformer_mode = true
+title = "2D platformer"
+
+[node name="Player" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-24, -36, 24, -36, 24, 36, -24, 36)
+color = Color(0.95, 0.55, 0.25, 1)
+
+[node name="CameraRig2D" parent="." instance=ExtResource("2_rig")]
+preset = ExtResource("3_preset")
+
+[node name="CameraInputMapAdapter" type="Node" parent="."]
+script = ExtResource("4_input")
+install_missing_actions = true
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Back" type="Button" parent="UI"]
+offset_left = 20.0
+offset_top = 110.0
+offset_right = 160.0
+offset_bottom = 150.0
+text = "Back to gallery"
+
+[node name="Help" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 760.0
+offset_bottom = 92.0
+text = "2D PLATFORMER — WASD/arrows move target · right stick/arrow look actions peek · R recenters"
+autowrap_mode = 2

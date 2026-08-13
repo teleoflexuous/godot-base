@@ -205,7 +205,7 @@ layout_mode = 2
 
 [node name="RebindHint" type="Label" parent="Settings/Content"]
 layout_mode = 2
-text = "G.U.I.D.E input contexts support project-specific rebinding. This base saves the selected profile and leaves bindings available for each game to expose."
+text = "The device bundle controls which G.U.I.D.E camera contexts are active. Camera rigs include a built-in settings and rebinding reference panel for each game to compose."
 autowrap_mode = 3
 
 [node name="Back" type="Button" parent="Settings/Content"]

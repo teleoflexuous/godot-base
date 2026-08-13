@@ -17,6 +17,18 @@ func test_template_ci_enforces_lifecycle_but_keeps_canonical_source_valid() -> v
 	assert_true(workflow.contains("release_readiness:"))
 	assert_true(workflow.contains("Credential-free web export"))
 	assert_false(workflow.contains("ITCH_DEPLOY_ENABLED"))
+	assert_true(workflow.contains("res://addons/camera_rigs/tests"))
+
+
+func test_template_requires_an_explicit_input_capability_choice() -> void:
+	var template_config: String = _read("res://template_project.cfg")
+	var initializer: String = _read("res://tools/initialize_project.gd")
+	var verifier: String = _read("res://tools/verify_template_lifecycle.gd")
+	assert_true(template_config.contains("input_capability_set=false"))
+	assert_true(template_config.contains('input_capability="all"'))
+	assert_true(initializer.contains("--input-capability="))
+	assert_true(initializer.contains('config.set_value("project", "input_capability_set", true)'))
+	assert_true(verifier.contains("input_capability_set"))
 
 
 func test_maintenance_workflows_and_vendor_lock_exist() -> void:

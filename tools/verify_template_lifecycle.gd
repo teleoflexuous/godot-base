@@ -2,6 +2,14 @@ extends SceneTree
 
 const CONFIG_PATH: String = "res://template_project.cfg"
 const CANONICAL_REPOSITORY: String = "teleoflexuous/godot-base"
+const INPUT_CAPABILITIES: Array[String] = [
+	"all",
+	"desktop",
+	"desktop_gamepad",
+	"mobile",
+	"gamepad",
+	"custom",
+]
 
 
 func _init() -> void:
@@ -19,8 +27,19 @@ func _init() -> void:
 		return
 	var state: String = str(config.get_value("project", "state", "template"))
 	var release_target: String = str(config.get_value("project", "release_target", "unconfigured"))
-	if state != "configured" or not release_target in ["none", "itch"]:
-		push_error("This generated repository must be initialized. Run tools/initialize_project.gd -- --name=YourGame --release-target=none|itch and commit template_project.cfg.")
+	var input_capability_set: bool = bool(config.get_value("project", "input_capability_set", false))
+	var input_capability: String = str(config.get_value("project", "input_capability", "all"))
+	if (
+		state != "configured"
+		or not release_target in ["none", "itch"]
+		or not input_capability_set
+		or not input_capability in INPUT_CAPABILITIES
+	):
+		push_error(
+			"This generated repository must be initialized. Run tools/initialize_project.gd -- "
+			+ "--name=YourGame --release-target=none|itch --input-capability=all|desktop|desktop_gamepad|mobile|gamepad|custom "
+			+ "and commit template_project.cfg."
+		)
 		quit(1)
 		return
 	quit(OK)

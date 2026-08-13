@@ -13,7 +13,7 @@
 | Need | Preferred Nodes |
 |---|---|
 | Root gameplay surface | `Node2D` |
-| Camera | `Camera2D` |
+| Camera | `Camera2D`, or `addons/camera_rigs/scenes/camera_rig_2d.tscn` for follow/pan/zoom |
 | Static collision | `StaticBody2D` + `CollisionShape2D` |
 | Moving actor | `CharacterBody2D` or scene-local `Node2D` depending on physics needs |
 | UI overlay | `CanvasLayer` + `Control` scenes |
@@ -23,7 +23,7 @@
 | Need | Preferred Nodes |
 |---|---|
 | Root gameplay surface | `Node3D` |
-| Camera | `Camera3D`, optionally under a pivot `Node3D` |
+| Camera | `Camera3D`, or the camera-rigs focus/yaw/pitch/shoulder/`SpringArm3D` scene |
 | Sun/global light | `DirectionalLight3D` |
 | Environment | `WorldEnvironment` with a shared `Environment` resource |
 | Static level collision | `StaticBody3D` + `CollisionShape3D` |

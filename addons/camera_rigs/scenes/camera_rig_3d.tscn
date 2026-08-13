@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://addons/camera_rigs/runtime/rigs3d/camera_rig_3d.gd" id="1_rig"]
+[ext_resource type="Script" path="res://addons/camera_rigs/runtime/effects/camera_motion_effects_3d.gd" id="2_effects"]
+
+[node name="CameraRig3D" type="Node3D"]
+script = ExtResource("1_rig")
+
+[node name="Focus" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Yaw" type="Node3D" parent="Focus"]
+unique_name_in_owner = true
+
+[node name="Pitch" type="Node3D" parent="Focus/Yaw"]
+unique_name_in_owner = true
+
+[node name="Shoulder" type="Node3D" parent="Focus/Yaw/Pitch"]
+unique_name_in_owner = true
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Focus/Yaw/Pitch/Shoulder"]
+unique_name_in_owner = true
+spring_length = 6.0
+margin = 0.05
+
+[node name="Camera3D" type="Camera3D" parent="Focus/Yaw/Pitch/Shoulder/SpringArm3D"]
+unique_name_in_owner = true
+current = true
+fov = 75.0
+
+[node name="MotionEffects3D" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_effects")

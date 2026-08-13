@@ -62,6 +62,7 @@ const NODE_LIKE_BASES: Dictionary = {
 }
 const PROJECT_ROOTS: Array[String] = [
 	"res://autoloads",
+	"res://addons/camera_rigs",
 	"res://scenes",
 	"res://scripts",
 	"res://tools",

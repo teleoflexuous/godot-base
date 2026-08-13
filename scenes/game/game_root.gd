@@ -19,9 +19,9 @@ func _ready() -> void:
 	for quality: StringName in GraphicsSettings.QUALITY_VALUES:
 		quality_option.add_item(String(quality))
 	quality_option.select(GraphicsSettings.QUALITY_VALUES.find(GraphicsSettings.get_quality()))
-	for profile: StringName in InputProfiles.PROFILE_IDS:
-		profile_option.add_item(String(profile))
-	profile_option.select(InputProfiles.PROFILE_IDS.find(InputProfiles.get_active_profile()))
+	for bundle: StringName in InputCapabilities.BUNDLE_IDS:
+		profile_option.add_item(InputCapabilities.display_name(bundle))
+	profile_option.select(maxi(InputCapabilities.BUNDLE_IDS.find(InputSettings.capability_bundle), 0))
 	master_slider.value = AudioManager.get_master_volume()
 	music_slider.value = AudioManager.get_music_volume()
 	effects_slider.value = AudioManager.get_effects_volume()
@@ -93,4 +93,8 @@ func _on_quality_selected(index: int) -> void:
 
 
 func _on_profile_selected(index: int) -> void:
-	var _saved: bool = InputProfiles.set_active_profile(InputProfiles.PROFILE_IDS[index])
+	if index < 0 or index >= InputCapabilities.BUNDLE_IDS.size():
+		return
+	var bundle: StringName = InputCapabilities.BUNDLE_IDS[index]
+	if bundle != InputCapabilities.BUNDLE_CUSTOM:
+		var _saved: bool = InputSettings.set_bundle(bundle)

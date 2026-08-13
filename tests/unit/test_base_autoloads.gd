@@ -8,6 +8,8 @@ func test_base_autoloads_are_registered() -> void:
 	assert_not_null(get_node_or_null("/root/AudioManager"), "AudioManager autoload should be registered.")
 	assert_not_null(get_node_or_null("/root/AudioSettings"), "AudioSettings autoload should be registered.")
 	assert_not_null(get_node_or_null("/root/GraphicsSettings"), "GraphicsSettings autoload should be registered.")
+	assert_not_null(get_node_or_null("/root/InputSettings"), "InputSettings autoload should be registered.")
+	assert_not_null(get_node_or_null("/root/CameraSettings"), "CameraSettings autoload should be registered.")
 	assert_not_null(get_node_or_null("/root/Analytics"), "Analytics autoload should be registered.")
 
 
