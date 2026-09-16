@@ -42,7 +42,6 @@
 - Included base addons are `gut`, `GoLogger`, and `GameAnalytics`.
 - `gut` and `GameAnalytics` are enabled by default. `GoLogger` is included but disabled until a project configures its file logging singleton.
 - ProperUI is owned and available, but intentionally not enabled by default. Check `dev_guides/properui_inventory.md` before building custom UI behavior that may already exist in ProperUI.
-- Domain-specific Rome systems are not part of this base unless a future project explicitly promotes them.
 
 ## Testing
 
